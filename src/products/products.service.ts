@@ -12,8 +12,26 @@ export class ProductsService {
     private productsRepository: Repository<Product>,
   ) {}
 
-  findAll() {
-    return this.productsRepository.find();
+  async findAll(page = 1, pageSize = 2, orderBy = 'id') {
+    const [items, total] = await this.productsRepository.findAndCount({
+      // сколько элементов пропустить (находясь на 2 странице он будет пропускать первые 2 элемента и возвращать 3 и 4 элементы)
+      skip: (page - 1) * pageSize,
+      // лимит элементов на странице
+      take: pageSize,
+      // сортировка по возрастанию(ASC)/убыванию(DESC)
+      order: { [orderBy]: 'ASC' },
+    });
+
+    return {
+      // по ключику items массив элементов
+      items,
+      // общее кол-во элементов
+      total,
+      // страница на которой находимся
+      page,
+      // общее кол-во страниц
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   findOne(id: number) {
