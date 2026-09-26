@@ -3,11 +3,11 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  title: string;
+  title!: string;
 
   @Column()
-  price: string;
+  price!: string;
 }
