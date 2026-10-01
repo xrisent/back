@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -18,6 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { randomUUID } from 'crypto';
+import { JwtAuthGuard } from 'src/users/jwt-auth.guard';
 
 // декоратор - функция высшего порядка, которая прописывается через @ над нужной функцией/классом
 @Controller('products')
@@ -29,6 +31,8 @@ export class ProductsController {
     return this.productsService.create(createProductDto);
   }
 
+  // добавляем защиту нашего эндпоинта, чтобы ответ могли получать только юзеры с валидным токеном
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(
     @Query()
@@ -71,7 +75,7 @@ export class ProductsController {
           cb(null, uniqueName);
         },
       }),
-      limits: { fileSize: 1024 * 1024 * 1024 }
+      limits: { fileSize: 1024 * 1024 * 1024 },
     }),
   )
   uploadImage(@UploadedFile() file: Express.Multer.File) {
